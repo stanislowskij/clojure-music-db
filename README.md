@@ -18,3 +18,5 @@ The three questions we want to answer using this database are as follows:
 3. (Using the top tags database) How popular are certain genres compared to others? For example, given all tags containing "rock" and all tags containing "pop", compare the sum of their ranks and see which one is lower (lower # for rank = more popular).
 
 Authors: Jaydon Stanislowski and Mahathir Mostafa
+
+TODO: Clarify that .zip must be unzipped, writing Clojure code to do this automatically is outside the scope of this project
