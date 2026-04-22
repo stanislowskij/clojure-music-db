@@ -4,7 +4,13 @@
 
 (deftest country-top-tracks-test
   (testing "Tests for country-top-tracks function"
-    (is (= '('("1" "SWIM" "BTS") '("2" "Body to Body" "BTS") '("3" "Hooligan" "BTS")) (country-top-tracks Mexico 3))))
-    (is (= '("2" "Body to Body" "BTS")) (country-top-tracks Venezuela 1))))
-    (is (= '("1" "SWIM" "BTS")) (country-top-tracks Mexico 5))))
+    (is (= (list (list "1" "SWIM" "BTS")
+                 (list "2" "Body to Body" "BTS")
+                 (list "3" "Hooligan" "BTS"))))
+           (country-top-tracks "Mexico" 3)
+    (is (= (list (list "1" "Babydoll" "Dominic Fike")
+                 (list "2" "Dracula" "Tame Impala")
+                 (list "3" "Streets" "Doja Cat") 
+                 (list "4" "Pink + White" "Frank Ocean"))
+           (country-top-tracks "Afghanistan" 4)))))
    

@@ -7,8 +7,14 @@
             [clojure.data.csv :as csv]))
 
 ;; File locations
-(def geo-top-tracks-csv "./resources/csv/geo_top_tracks.csv")
+;; This is the original database (extremely large). Don't use it.
+;; #_(def geo-top-tracks-csv "./resources/csv/geo_top_tracks.csv")
+
+;; This is the reduced version of the one above.
+(def geo-top-tracks-csv "./resources/csv/geo_top_tracks_TRIMMED.csv")
+
 (def global-top-artists-csv "./resources/csv/global_top_artists.csv")
+
 (def global-top-tags-csv "./resources/csv/global_top_tags.csv")
 
 ;; Reading our CSV files into variables, should contain the data as
@@ -47,22 +53,26 @@
     ;; Write the new data
     (write-to-csv "./resources/csv/geo_top_tracks_TRIMMED.csv")))
 
-;; REPL is really really really really slow if these are uncommented.
-
+;; Do not uncomment this one unless you want REPL to be really really slow.
+;; Use the TRIMMED database instead. This is just our original copy of it.
 ;; Regional top tracks:
 ;;     ["country", "rank", "track", "artist", "listeners", "fetched_at",
 ;;      "track_url", "artist_mbid", "artist_url", "playcount"]
-;; This dataset is really big. We should consider reducing this one.
 ;;(def regional-top-tracks (get-from-csv geo-top-tracks-csv))
 
+;; Regional top tracks:
+;;    ["country", "rank", "track", "artist", "listeners", "fetched_at",
+;;     "track_url", "artist_mbid", "artist_url", "playcount"]
+(def regional-top-tracks (get-from-csv geo-top-tracks-csv))
+
 ;; Global top artists:
-;;     ["rank", "artist", "listeners", "playcount", "fetched_at", 
-;;      "artist_mbid", "artist_url"]
-;;(def global-top-artists (get-from-csv global-top-artists-csv))
+;;    ["rank", "artist", "listeners", "playcount", "fetched_at", 
+;;     "artist_mbid", "artist_url"]
+(def global-top-artists (get-from-csv global-top-artists-csv))
 
 ;; Global top tags:
-;;     ["rank", "tag", "tag_url", "reach", "taggings", "fetched_at"]
-;;(def global-top-tags (get-from-csv global-top-tags-csv))
+;;    ["rank", "tag", "tag_url", "reach", "taggings", "fetched_at"]
+(def global-top-tags (get-from-csv global-top-tags-csv))
 
 ;; Questions to answer about the databases:
 
@@ -71,7 +81,7 @@
 ;; and uses the global_top_artists database to return the top 10 tracks
 ;; sorted by rank.
 (defn country-top-tracks
-  "Given a country, returns the top n tracks from that country,
+  "Given a country, returns the top n tracks (up to 50) from that country,
    removing unnecessary data from each entry.
    Each vector in the resulting collection is formatted as [\"rank\", \"track\", \"artist\"]."
   [country, n]
@@ -80,12 +90,12 @@
     ;; the country that the user gave.
     (filter #(= country (first %)))
     ;; Sort by the second column ("rank").
-    (sort-by #(Integer/parseInt (second %))))
+    (sort-by #(Integer/parseInt (second %)))
     ;; Take the first n entries, or the top n tracks that the user wanted.
     (take n)
     ;; Trim the rest of the columns off to exclude unnecessary metadata in the results.
     ;; This removes "country", "listeners", "fetched_at", "artist_mbid", etc.
-    (map #(rest (take 4 %))))
+    (map #(rest (take 4 %)))))
 
 ;; (defn -main
 ;;   "I don't do a whole lot ... yet."
