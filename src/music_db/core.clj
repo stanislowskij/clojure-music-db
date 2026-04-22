@@ -13,6 +13,8 @@
 ;; This is the reduced version of the one above.
 (def geo-top-tracks-csv "./resources/csv/geo_top_tracks_TRIMMED.csv")
 
+(def global-top-tracks-csv "./resources/csv/global_top_tracks.csv")
+
 (def global-top-artists-csv "./resources/csv/global_top_artists.csv")
 
 (def global-top-tags-csv "./resources/csv/global_top_tags.csv")
@@ -65,6 +67,11 @@
 ;;     "track_url", "artist_mbid", "artist_url", "playcount"]
 (def regional-top-tracks (get-from-csv geo-top-tracks-csv))
 
+;; Global top tracks:
+;;    ["rank", "track", "artist", "playcount", "fetched_at", "track_mbid", 
+;;     "track_url", "artist_mbid", "artist_url", "listeners"]
+(def global-top-tracks (get-from-csv global-top-tracks-csv))
+
 ;; Global top artists:
 ;;    ["rank", "artist", "listeners", "playcount", "fetched_at", 
 ;;     "artist_mbid", "artist_url"]
@@ -76,14 +83,14 @@
 
 ;; Questions to answer about the databases:
 
-;; 1. Given a country, what are the top 10 tracks in that country?
+;; 1. Given a country, what are the top n tracks in that country?
 ;; Write a function that takes the name of a country in the world
-;; and uses the global_top_artists database to return the top 10 tracks
+;; and uses the global_top_artists database to return the top n tracks
 ;; sorted by rank.
 (defn country-top-tracks
   "Given a country, returns the top n tracks (up to 50) from that country,
    removing unnecessary data from each entry.
-   Each vector in the resulting collection is formatted as [\"rank\", \"track\", \"artist\"]."
+   Each sublist in the resulting collection is formatted as (\"rank\", \"track\", \"artist\")."
   [country, n]
   (->> regional-top-tracks
     ;; Filter by the first column ("country") of each row. Make sure it matches
@@ -96,6 +103,26 @@
     ;; Trim the rest of the columns off to exclude unnecessary metadata in the results.
     ;; This removes "country", "listeners", "fetched_at", "artist_mbid", etc.
     (map #(rest (take 4 %)))))
+
+;; 2. Given an artist, how many songs do they have in the top n songs globally?
+;; i.e., how popular is their music globally?
+(defn artist-top-songs
+  "Given an artist name, retrieves all of their hit songs from the list of top n
+   tracks globally, removing unnecessary data from each entry.
+   Each sublist in the resulting collection is formatted as (\"rank\", \"track\")."
+  [artist, n]
+  (try 
+    (->> global-top-tracks
+    ;; Filter rank <= n, also remove first row which has the labels
+    (filter #(and (not= "rank" (first %)) (>= n (Integer/parseInt (first %)))))
+    ;; Filter on the "artist" (3rd) column
+    (filter #(= artist (nth % 2)))
+    ;; Sort by rank
+    (sort-by #(Integer/parseInt (first %)))
+    ;; Trim unnecessary data, i.e. take first two columns
+    (map #(take 2 %)))
+    (catch ClassCastException _ 
+      (println "Invalid data. Arguments must be a string followed by a number."))))
 
 ;; (defn -main
 ;;   "I don't do a whole lot ... yet."
