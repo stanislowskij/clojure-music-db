@@ -29,7 +29,7 @@
        (let [data (csv/read-csv reader)]
          (reduce conj [] data))))
 
-;; We are only using these two functions once in the project.
+;; We are only using these next two functions once in the project.
 ;; This is to trim the geo-top-tracks.csv dataset so that each country
 ;; only has its top 50 songs. It is impractical for our purposes to have
 ;; each country with thousands of songs listed, as reading it into the REPL
@@ -41,19 +41,22 @@
   (with-open [writer (io/writer path)]
     (csv/write-csv writer, data)))
 
-(defn- prune-data
-  "Helper function to trim geo_top_tracks.csv to only include
-   50 songs per country, to make the dataset easier to work with."
-  []
+(defn- trim-geo-data
+  "Helper function to trim geo_top_tracks.csv and geo_top_artists.csv
+   to only include 50 songs/artists per country, to make the dataset 
+   easier to work with. This function should ONLY be called on these
+   two datasets."
+  [csv]
+  ;; "./resources/csv/{name}_TRIMMED.csv"
+  (def new-name (clojure.string/replace csv #".{4}$" "_TRIMMED.csv"))
   ;; Load the dataset in once
-  (def regional-top-tracks (get-from-csv geo-top-tracks-csv))
-  (->> regional-top-tracks
+  (->> (get-from-csv csv)
     ;; Take the second column of each entry (rank), reduce to
     ;; entries whose rank value <= 50
     (filter #(or (= "rank" (second %)) 
-                  (>= 50 (Integer/parseInt (second %)))))
+                 (>= 50 (Integer/parseInt (second %)))))
     ;; Write the new data
-    (write-to-csv "./resources/csv/geo_top_tracks_TRIMMED.csv")))
+    (write-to-csv new-name)))
 
 ;; Do not uncomment this one unless you want REPL to be really really slow.
 ;; Use the TRIMMED database instead. This is just our original copy of it.
@@ -62,24 +65,24 @@
 ;;      "track_url", "artist_mbid", "artist_url", "playcount"]
 ;;(def regional-top-tracks (get-from-csv geo-top-tracks-csv))
 
-;; Regional top tracks:
-;;    ["country", "rank", "track", "artist", "listeners", "fetched_at",
-;;     "track_url", "artist_mbid", "artist_url", "playcount"]
-(def regional-top-tracks (get-from-csv geo-top-tracks-csv))
+;; ;; Regional top tracks:
+;; ;;    ["country", "rank", "track", "artist", "listeners", "fetched_at",
+;; ;;     "track_url", "artist_mbid", "artist_url", "playcount"]
+;; (def regional-top-tracks (get-from-csv geo-top-tracks-csv))
 
-;; Global top tracks:
-;;    ["rank", "track", "artist", "playcount", "fetched_at", "track_mbid", 
-;;     "track_url", "artist_mbid", "artist_url", "listeners"]
-(def global-top-tracks (get-from-csv global-top-tracks-csv))
+;; ;; Global top tracks:
+;; ;;    ["rank", "track", "artist", "playcount", "fetched_at", "track_mbid", 
+;; ;;     "track_url", "artist_mbid", "artist_url", "listeners"]
+;; (def global-top-tracks (get-from-csv global-top-tracks-csv))
 
-;; Global top artists:
-;;    ["rank", "artist", "listeners", "playcount", "fetched_at", 
-;;     "artist_mbid", "artist_url"]
-(def global-top-artists (get-from-csv global-top-artists-csv))
+;; ;; Global top artists:
+;; ;;    ["rank", "artist", "listeners", "playcount", "fetched_at", 
+;; ;;     "artist_mbid", "artist_url"]
+;; (def global-top-artists (get-from-csv global-top-artists-csv))
 
-;; Global top tags:
-;;    ["rank", "tag", "tag_url", "reach", "taggings", "fetched_at"]
-(def global-top-tags (get-from-csv global-top-tags-csv))
+;; ;; Global top tags:
+;; ;;    ["rank", "tag", "tag_url", "reach", "taggings", "fetched_at"]
+;; (def global-top-tags (get-from-csv global-top-tags-csv))
 
 ;; Questions to answer about the databases:
 
@@ -111,20 +114,26 @@
    tracks globally, removing unnecessary data from each entry.
    Each sublist in the resulting collection is formatted as (\"rank\", \"track\")."
   [artist, n]
-  (try 
+;;  (try 
     (->> global-top-tracks
-    ;; Filter rank <= n, also remove first row which has the labels
-    (filter #(and (not= "rank" (first %)) (>= n (Integer/parseInt (first %)))))
-    ;; Filter on the "artist" (3rd) column
-    (filter #(= artist (nth % 2)))
-    ;; Sort by rank
-    (sort-by #(Integer/parseInt (first %)))
-    ;; Trim unnecessary data, i.e. take first two columns
-    (map #(take 2 %)))
-    (catch ClassCastException _ 
-      (println "Invalid data. Arguments must be a string followed by a number."))))
+      ;; Remove the row containing "rank"
+      (filter #(not= "rank" (first %)))
+      ;; Filter to only rows whose rank value <= n
+      (filter #(>= n (Integer/parseInt (first %))))
+      ;; Filter on the "artist" (3rd) column
+      (filter #(= artist (nth % 2)))
+      ;; No need to sort by rank since this is the default
+      ;; sorting for this dataset.
+      ;; Trim unnecessary data, i.e. take first two columns
+      (map #(take 2 %))))
+;;    (catch Exception _ 
+;;      (str "Invalid data. Arguments must be a string followed by a number."))))
 
-;; (defn -main
-;;   "I don't do a whole lot ... yet."
-;;   [& args]
-;;   (println "Hello, World!"))
+;; 3. Given an artist, what countries are they the most popular in?
+
+(defn -main
+  "Unzips the dataset located in /resources and performs relevant data
+   processing (trimming geo_top_artists.csv and geo_top_tracks.csv). 
+   This only needs to run once using lein run."
+  [& args]
+  (println "Hello, World!"))
