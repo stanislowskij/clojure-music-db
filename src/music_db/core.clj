@@ -3,7 +3,6 @@
 
 (ns music-db.core
   (:require [music-db.data-handling :as data]
-            [clojure.java.shell :refer [sh]]
             [clojure.java.io :as io]))
 
 ;; File locations
