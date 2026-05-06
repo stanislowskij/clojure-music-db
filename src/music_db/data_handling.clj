@@ -8,7 +8,7 @@
 
 ;; Reading our CSV files into variables, should contain the data as
 ;; Clojure sequences
-(defn- get-from-csv
+(defn- read-from-csv
   "Takes a path to a .csv file and outputs a lazy sequence of the data.
    The first row will contain the legend/keys of the .csv file.
    This is a helper function for the function below."
@@ -31,7 +31,7 @@
     - Returns the data from the file as a list of maps,
       according to the above operations."
   [path]
-  (let [raw (get-from-csv path)]
+  (let [raw (read-from-csv path)]
     (map #(zipmap (map keyword (first raw)) %) (rest raw))))
 
 (defn file-exists?
@@ -81,7 +81,7 @@
   ;; "./resources/csv/{name}_TRIMMED.csv"
   (def new-name (clojure.string/replace csv #".{4}$" "_TRIMMED.csv"))
   ;; Load the dataset in once
-  (->> (get-from-csv csv)
+  (->> (read-from-csv csv)
     ;; Take the second column of each entry (rank), reduce to
     ;; entries whose rank value <= 50
     (filter #(or (= "rank" (second %)) 
