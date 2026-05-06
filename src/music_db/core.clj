@@ -2,87 +2,33 @@
 ;; CSCI 2601 Final Project
 
 (ns music-db.core
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.data.csv :as csv]))
+  (:require [music-db.data-handling :as data]
+            [clojure.java.shell :refer [sh]]
+            [clojure.java.io :as io]))
 
 ;; File locations
-;; This is the original database (extremely large). Don't use it.
-;; #_(def geo-top-tracks-csv "./resources/csv/geo_top_tracks.csv")
-
-;; This is the reduced version of the one above.
+(def csv-zip "./resources/csv.zip")
 (def geo-top-tracks-csv "./resources/csv/geo_top_tracks_TRIMMED.csv")
-
+(def geo-top-artists-csv "./resources/csv/geo_top_artists_TRIMMED.csv")
 (def global-top-tracks-csv "./resources/csv/global_top_tracks.csv")
 
-(def global-top-artists-csv "./resources/csv/global_top_artists.csv")
-
-(def global-top-tags-csv "./resources/csv/global_top_tags.csv")
-
-;; Reading our CSV files into variables, should contain the data as
-;; Clojure sequences
-(defn get-from-csv
-  "Takes a path to a .csv file and outputs a lazy sequence of the data.
-   The first row will contain the legend/keys of the .csv file."
-  [path]
-  (with-open [reader (io/reader path)]
-       (let [data (csv/read-csv reader)]
-         (reduce conj [] data))))
-
-;; We are only using these next two functions once in the project.
-;; This is to trim the geo-top-tracks.csv dataset so that each country
-;; only has its top 50 songs. It is impractical for our purposes to have
-;; each country with thousands of songs listed, as reading it into the REPL
-;; is extremely slow.
-(defn write-to-csv
-  "Takes a list of lists (data) and outputs a new .csv file to the 
-   specified path. Helper function here for our purposes."
-  [path, data]
-  (with-open [writer (io/writer path)]
-    (csv/write-csv writer, data)))
-
-(defn- trim-geo-data
-  "Helper function to trim geo_top_tracks.csv and geo_top_artists.csv
-   to only include 50 songs/artists per country, to make the dataset 
-   easier to work with. This function should ONLY be called on these
-   two datasets."
-  [csv]
-  ;; "./resources/csv/{name}_TRIMMED.csv"
-  (def new-name (clojure.string/replace csv #".{4}$" "_TRIMMED.csv"))
-  ;; Load the dataset in once
-  (->> (get-from-csv csv)
-    ;; Take the second column of each entry (rank), reduce to
-    ;; entries whose rank value <= 50
-    (filter #(or (= "rank" (second %)) 
-                 (>= 50 (Integer/parseInt (second %)))))
-    ;; Write the new data
-    (write-to-csv new-name)))
-
-;; Do not uncomment this one unless you want REPL to be really really slow.
-;; Use the TRIMMED database instead. This is just our original copy of it.
+;; Data sets:
+;; -----------------------------------------------------------------------
 ;; Regional top tracks:
-;;     ["country", "rank", "track", "artist", "listeners", "fetched_at",
-;;      "track_url", "artist_mbid", "artist_url", "playcount"]
-;;(def regional-top-tracks (get-from-csv geo-top-tracks-csv))
+;;    ["country", "rank", "track", "artist", "listeners", "fetched_at",
+;;     "track_url", "artist_mbid", "artist_url", "playcount"]
+(def regional-top-tracks (data/get-from-csv geo-top-tracks-csv))
 
-;; ;; Regional top tracks:
-;; ;;    ["country", "rank", "track", "artist", "listeners", "fetched_at",
-;; ;;     "track_url", "artist_mbid", "artist_url", "playcount"]
-;; (def regional-top-tracks (get-from-csv geo-top-tracks-csv))
+;; Regional top artists:
+;;    ["country", "rank", "artist", "artist_mbid", "artist_url", 
+;;     "listeners", "fetched_at"]
+(def regional-top-artists (data/get-from-csv geo-top-artists-csv))
 
-;; ;; Global top tracks:
-;; ;;    ["rank", "track", "artist", "playcount", "fetched_at", "track_mbid", 
-;; ;;     "track_url", "artist_mbid", "artist_url", "listeners"]
-;; (def global-top-tracks (get-from-csv global-top-tracks-csv))
-
-;; ;; Global top artists:
-;; ;;    ["rank", "artist", "listeners", "playcount", "fetched_at", 
-;; ;;     "artist_mbid", "artist_url"]
-;; (def global-top-artists (get-from-csv global-top-artists-csv))
-
-;; ;; Global top tags:
-;; ;;    ["rank", "tag", "tag_url", "reach", "taggings", "fetched_at"]
-;; (def global-top-tags (get-from-csv global-top-tags-csv))
+;; Global top tracks:
+;;    ["rank", "track", "artist", "playcount", "fetched_at", "track_mbid", 
+;;     "track_url", "artist_mbid", "artist_url", "listeners"]
+(def global-top-tracks (data/get-from-csv global-top-tracks-csv))
+;; -----------------------------------------------------------------------
 
 ;; Questions to answer about the databases:
 
@@ -133,7 +79,22 @@
 
 (defn -main
   "Unzips the dataset located in /resources and performs relevant data
-   processing (trimming geo_top_artists.csv and geo_top_tracks.csv). 
+   processing. Also provides some examples of the project work.
    This only needs to run once using lein run."
   [& args]
-  (println "Hello, World!"))
+  ;; Verify file structure is missing and .zip is present
+  (if (and (data/file-exists? csv-zip)
+           (not (data/file-exists? geo-top-tracks-csv 
+                  geo-top-artists-csv global-top-tracks-csv)))
+    ;; Extract the data
+    (do
+      (println "Unzipping csv.zip...")
+      (data/unzip csv-zip "./resources/csv/")
+      ;; TODO: Probably better to keep the .zip for now for testing purposes.
+      ;; (println "Removing csv.zip...")
+      ;; (.delete (io/file "./resources/csv.zip"))
+      (println "All done.\nRunning examples:"))
+    ;; Print and do nothing
+    (println "csv.zip is already unzipped.\nRunning examples:"))
+  ;; Examples
+)

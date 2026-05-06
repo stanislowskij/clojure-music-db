@@ -1,4 +1,4 @@
-#_(ns exercises.exercise-solutions)
+(ns exercises.exercise-solutions)
 
 ;; 1. Write a function (multiply-all) that takes a list or a vector 
 ;; of numbers and returns their product. If the user enters any 
