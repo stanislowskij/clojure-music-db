@@ -8,9 +8,10 @@
 
 ;; Reading our CSV files into variables, should contain the data as
 ;; Clojure sequences
-(defn get-from-csv
+(defn- get-from-csv
   "Takes a path to a .csv file and outputs a lazy sequence of the data.
-   The first row will contain the legend/keys of the .csv file."
+   The first row will contain the legend/keys of the .csv file.
+   This is a helper function for the function below."
   [path]
   (try
     (with-open [reader (io/reader path)]
@@ -20,6 +21,18 @@
       (.println *err* (str "ERROR: Could not find a file at " path 
         ". Please ensure that csv.zip has been unzipped and "
         "that the directory structure is correct.")))))
+
+(defn map-from-csv
+  ;; TODO: Consider simplifying this docstring somehow, way too wordy
+  "Takes a path to a .csv file and performs the following operations:
+    - Reads the data from the file into a list of lists.
+    - Converts the first row into a vector of keywords.
+    - Converts all following lines into map values, with keys as above.
+    - Returns the data from the file as a list of maps,
+      according to the above operations."
+  [path]
+  (let [raw (get-from-csv path)]
+    (map #(zipmap (map keyword (first raw)) %) (rest raw))))
 
 (defn file-exists?
   "Returns true if a file (or files) exists at the specified path, otherwise
