@@ -99,3 +99,52 @@
     ;; Trim unnecessary data, this leaves the user
     ;; with {:rank, :country, :artist}.
     (map #(select-keys % [:rank :country]))))
+
+(defn -main
+  "Unzips the dataset located in /resources and performs relevant data
+   processing. Also provides some examples of the project work.
+   This only needs to run once using lein run."
+  [& args]
+  ;; Verify file structure is missing and .zip is present
+  (if (and (data/file-exists? csv-zip)
+           (not (data/file-exists? geo-top-tracks-csv 
+                  geo-top-artists-csv global-top-tracks-csv)))
+    ;; Extract the data
+    (do
+      (println "Unzipping csv.zip...")
+      (data/unzip csv-zip "./resources/csv/")
+      ;; TODO: Probably better to keep the .zip for now for testing purposes.
+      ;; (println "Removing csv.zip...")
+      ;; (.delete (io/file "./resources/csv.zip"))
+      (println "All done."
+      (println "Running examples:"))
+    ;; Print and do nothing
+    (println "csv.zip is already unzipped.")
+    (println "Running examples:")))
+
+  ;; Examples
+  (println "Ex. 1: What are the top 15 tracks in Norway?")
+  (println "(country-top-tracks \"Norway\" 15)")
+  (println)
+  ;; Using printf and doseq+destructuring for this is 
+  ;; sorta convoluted, but I think the output speaks for itself...
+  (doseq [x (country-top-tracks "Norway" 15)]
+    (printf "#%s) %s by %s" (:rank x) (:track x) (:artist x))
+    (println)
+    (flush))
+  (println)
+
+  (println "Ex. 2: What are Rihanna's top 10 songs?")
+  (println "(artist-top-songs \"Rihanna\" 10)")
+  (doseq [[i x] (map vector (range 1 11) (artist-top-songs "Rihanna" 10))]
+    (printf "#%s) %s (#%s globally)" i (:track x) (:rank x))
+    (println)
+    (flush))
+  (println)
+
+  (println "Ex. 3: What are the top 8 countries where TWICE is the most popular?")
+  (println "(artist-top-countries \"TWICE\" 8)")
+  (doseq [[i x] (map vector (range 1 9) (artist-top-countries "TWICE" 8))]
+    (printf "#%s) %s (#%s in the region)" i (:country x) (:rank x))
+    (println)
+    (flush)))
