@@ -86,7 +86,7 @@
 (defn artist-top-countries
   "Given an artist's name, retrieves the first n countries in which
    they appear in the top 50 artists, sorted by rank. Output contains
-   {:rank, :country, :artist}."
+   {:rank, :country}."
   [artist, n]
   (->> regional-top-artists
     ;; Filter to entries whose :artist matches user input
@@ -97,7 +97,7 @@
     (take n)
     ;; Trim unnecessary data, this leaves the user
     ;; with {:rank, :country, :artist}.
-    (map #(select-keys % [:rank :country :artist]))))
+    (map #(select-keys % [:rank :country]))))
 
 ;; Entry point for lein run
 
