@@ -30,9 +30,9 @@ The three questions we want to answer using this database are as follows:
 
 1. Given a country, what are the top n tracks users are listening to in that country (according to Last.fm play count)?
 
-2. Given an artist, what are their top n tracks globally (according to Last.fm ranking)?
+2. Given an artist, what are their top n songs out of all global top songs (according to Last.fm ranking)?
 
-3. Given an artist, what are the top n countries that listen to their music (according to Last.fm listener count?)
+3. Given an artist, what are the top n countries that listen to their music (according to Last.fm ranking?)
 
 # Approach
 

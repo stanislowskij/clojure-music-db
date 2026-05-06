@@ -59,21 +59,22 @@
     ;; with {:rank, :track, :artist}
     (map #(select-keys % [:rank :track :artist]))))
 
-;; 2. Given an artist, how many songs do they have in the top n 
-;; songs globally?
+;; 2. Given an artist, what are their top n songs out of all global
+;; top songs?
 ;; Write a function that takes an artist and uses the global-top-tracks
-;; database to return the tracks by that artist in the top n global tracks.
+;; database to return the first n tracks by that artist in the list of
+;; global top tracks.
 (defn artist-top-songs
   "Given an artist's name, retrieves all of their tracks from the top n
    tracks globally. Output contains {:rank, :track}."
   [artist, n]
   (->> global-top-tracks
-    ;; Filter to entries whose rank value <= n
-    (filter #(>= n (Integer/parseInt (:rank %))))
     ;; Filter to entries whose :artist matches user input
     (filter #(= artist (:artist %)))
     ;; Sort by the :rank column (possibly unnecessary)
     (sort-by #(Integer/parseInt (:rank %)))
+    ;; Trim to first n results
+    (take n)
     ;; Trim unnecessary data, this leaves the user
     ;; with {:rank, :track}
     (map #(select-keys % [:rank :track]))))
