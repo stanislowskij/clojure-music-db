@@ -36,6 +36,26 @@ The three questions we want to answer using this database are as follows:
 
 # Approach
 
+While the data from Kaggle originally came with five data sets in the form of .csv files, we chose three that were relevant to our problem and removed the other two in order to save space. Additionally, we had to pre-process the data to reduce the file size, since `geo_top_artists.csv` and `geo_top_tracks.csv` contain tens of thousands of entries *per country*, resulting in extremely large data sizes that were difficult and slow to work with. 
 
+In order to resolve this, we wrote the `trim-geo-data` function to run once in the REPL, along with `write-to-csv` to keep the data consistent with our other files and save it as a .csv file. In a further attempt to deal with the file size issue, we kept the dataset as a .zip file in our repository and wrote code to extract the archive before loading any data.
+
+To answer the questions about our data set, we first needed a way to extract data directly from the .csv files and convert it into a data format that is idiomatic and easy to work with in Clojure. To that end, we wrote the functions `read-from-csv` and `map-from-csv` in the `data_handling.clj` file. These functions use the `clojure.data.csv` library to first extract a list of lists from the .csv files, where each sublist represents a data entry/row in the .csv file. Then, `map-from-csv` converts each sublist into a map, using the first row of the .csv file as the keys (legend) for the maps.
+
+By formatting each data entry as a map, we can easily extract values from the entries by referencing their key in Clojure, and keeping the data in an ordered list makes it easier to perform operations like `sort-by`, `map`, `filter`, and more. Handling the data in this way is ideal for our problem, since we are essentially just using Clojure to perform database queries, and these functions are optimal for achieving that in a clean and readable way using threading macros (`->>`).
+
+We also used a few Clojure functions/special forms that weren't covered in class. Namely: 
+- `try` and `catch` for error handling to ensure that data exists and is properly structured before trying to run anything.
+- `select-keys` as part of our data querying to only return necessary map keys to the user, since some of our data entries contain columns that aren't particularly useful for our purposes, like MBIDs (MusicBrainz identifiers) and track URLs.
+- `doseq` and `printf` for running examples and printing results in a neatly-formatted way for each entry returned
+- Various Java interop methods for reading/writing data between files
 
 # Findings
+
+At the time of writing this, the data we are using doesn't update between runs of the project, even though user listening data changes constantly, and this is reflected by the Kaggle dataset updating weekly. However, there were some interesting trends in the snapshot that we did observe through testing our code. Some examples of these notable observations include:
+
+- Tracks by K-pop group BTS dominate the charts in most Latin American countries, including Venezuela, Mexico, Argentina, Chile, Paraguay, etc., with the top tracks charts looking almost identical for each.
+
+- Kanye West is the top artist in a fairly large number of countries, including Australia, Denmark, Iceland, Israel, Russia, Sweden, United States, Canada, United Kingdom, and more.
+
+- TODO: Write more

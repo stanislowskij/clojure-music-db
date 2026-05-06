@@ -1,6 +1,7 @@
 (ns music-db.core-test
   (:require [clojure.test :refer :all]
-            [music-db.core :refer :all]))
+            [music-db.core :refer :all]
+            [music-db.data-handling :refer :all]))
 
 (deftest country-top-tracks-test
   (testing "Tests for country-top-tracks function"
