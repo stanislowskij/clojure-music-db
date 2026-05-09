@@ -79,12 +79,12 @@
    two datasets."
   [csv]
   ;; "./resources/csv/{name}_TRIMMED.csv"
-  (def new-name (clojure.string/replace csv #".{4}$" "_TRIMMED.csv"))
-  ;; Load the dataset in once
-  (->> (read-from-csv csv)
-    ;; Take the second column of each entry (rank), reduce to
-    ;; entries whose rank value <= 50
-    (filter #(or (= "rank" (second %)) 
-                 (>= 50 (Integer/parseInt (second %)))))
-    ;; Write the new data
-    (write-to-csv new-name)))
+  (let [new-name (clojure.string/replace csv #".{4}$" "_TRIMMED.csv")]
+    ;; Load the dataset in once
+    (->> (read-from-csv csv)
+      ;; Take the second column of each entry (rank), reduce to
+      ;; entries whose rank value <= 50  
+      (filter #(or (= "rank" (second %))
+                   (>= 50 (Integer/parseInt (second %)))))
+      ;; Write the new data
+      (write-to-csv new-name))))

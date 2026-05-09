@@ -2,8 +2,7 @@
 ;; CSCI 2601 Final Project
 
 (ns music-db.core
-  (:require [music-db.data-handling :as data]
-            [clojure.java.io :as io]))
+  (:require [music-db.data-handling :as data]))
 
 ;; File locations
 (def csv-zip "./resources/csv.zip")
@@ -109,7 +108,7 @@
   "Unzips the dataset located in /resources and performs relevant data
    processing. Also provides some examples of the project work.
    This only needs to run once using lein run."
-  [& args]
+  []
   ;; Verify file structure is missing and .zip is present
   (if (and (data/file-exists? csv-zip)
            (not (data/file-exists? geo-top-tracks-csv 
@@ -122,10 +121,11 @@
       ;; (println "Removing csv.zip...")
       ;; (.delete (io/file "./resources/csv.zip"))
       (println "All done."
-      (println "Running examples:"))
+      (println "Running examples:")))
     ;; Print and do nothing
-    (println "csv.zip is already unzipped.")
-    (println "Running examples:")))
+    (do 
+      (println "csv.zip is already unzipped.")
+      (println "Running examples:")))
 
   ;; Examples
   (println "Ex. 1: What are the top 15 tracks in Norway?")
