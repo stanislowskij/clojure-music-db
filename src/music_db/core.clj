@@ -59,6 +59,8 @@
     ;; with {:rank, :track, :artist}
     (map #(select-keys % [:rank :track :artist]))))
 
+
+
 ;; 2. Given an artist, what are their top n songs out of all global
 ;; top songs?
 ;; Write a function that takes an artist and uses the global-top-tracks
@@ -78,6 +80,7 @@
     ;; Trim unnecessary data, this leaves the user
     ;; with {:rank, :track}
     (map #(select-keys % [:rank :track]))))
+
 
 ;; 3. Given an artist, what are the first n countries they are most 
 ;; popular in?
@@ -100,6 +103,8 @@
     ;; with {:rank, :country, :artist}.
     (map #(select-keys % [:rank :country]))))
 
+
+;;Helper function to 
 (defn -main
   "Unzips the dataset located in /resources and performs relevant data
    processing. Also provides some examples of the project work.
