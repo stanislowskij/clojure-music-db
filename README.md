@@ -10,15 +10,15 @@ The repository also contains work for the exercises and solutions component of t
 
 Requires Clojure version 1.11.0 or later and Leiningen. 
 
-Before running any code, the [zip file](/resources/csv.zip) located in the `/resources` folder needs to be unzipped into a directory called `resources/csv/`. The resulting directory should contain three files:
+Before running any code (including tests), the [zip file](/resources/csv.zip) located in the `/resources` folder needs to be unzipped into a directory called `resources/csv/`. The resulting directory should contain three files:
 
-- geo_top_tracks.csv
-- geo_top_artists.csv
+- geo_top_tracks_TRIMMED.csv
+- geo_top_artists_TRIMMED.csv
 - global_top_tracks.csv
 
 Without these .csv files, the project will not run. 
 
-Simply calling `lein run` will extract the zip file in `/resources` (if this hasn't been done already) with the appropriate directory structure and delete the zip file for convenience. It will also run a few examples of the functions written to answer the project questions. You can also use `lein repl` to try out these functions yourself with your own arguments. 
+Calling `lein run` will extract the zip file in `/resources` (if this hasn't been done already) with the appropriate directory structure and delete the zip file for convenience. It will also run a few examples of the functions written to answer the project questions (note: examples currently only work on the second run if the zip folder wasn't unzipped before running the project. We could look into fixing this eventually). You can also use `lein repl` to try out these functions yourself with your own arguments. 
 
 # Project criteria
 
