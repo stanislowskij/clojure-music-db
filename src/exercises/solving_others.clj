@@ -25,3 +25,10 @@
    x."
   (partition-by #(= % x) coll))
 ;; Tests in test/music_db/solving_others_test.clj
+
+;; We learned that (group-by) and (partition-by) are fairly
+;; helpful functions for aggregating data and organizing it
+;; according to certain criteria. (partition-by) especially
+;; seems useful for cases where you would want to split a
+;; list down a certain element in it, or if you just want
+;; another way of filtering a list.
